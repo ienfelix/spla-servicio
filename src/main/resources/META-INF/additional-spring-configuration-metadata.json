@@ -1,0 +1,32 @@
+{"properties": [
+  {
+    "name": "database.Url",
+    "type": "java.lang.String",
+    "description": "A description for 'database.Url'"
+  },
+  {
+    "name": "database.Username",
+    "type": "java.lang.String",
+    "description": "A description for 'database.Username'"
+  },
+  {
+    "name": "database.Password",
+    "type": "java.lang.String",
+    "description": "A description for 'database.Password'"
+  },
+  {
+    "name": "cumplo.Url",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.Url'"
+  },
+  {
+    "name": "cumplo.Username",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.Username'"
+  },
+  {
+    "name": "cumplo.Password",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.Password'"
+  }
+]}
