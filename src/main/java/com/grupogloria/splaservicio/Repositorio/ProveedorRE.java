@@ -6,13 +6,10 @@ import java.sql.ResultSet;
 
 import com.grupogloria.splaservicio.Comun.Conexion;
 import com.grupogloria.splaservicio.Comun.Constante;
+import com.grupogloria.splaservicio.Comun.Log;
 import com.grupogloria.splaservicio.Interfaz.ProveedorIN;
 import com.grupogloria.splaservicio.Modelo.ObjetoProveedorMO;
 import com.grupogloria.splaservicio.Modelo.ProveedorMO;
-
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
 
 public class ProveedorRE implements ProveedorIN
 {
@@ -20,11 +17,12 @@ public class ProveedorRE implements ProveedorIN
     private Connection _con = null;
     private CallableStatement _cst = null;
     private ResultSet _rst = null;
-    private Logger _logger = (Logger) LoggerFactory.getLogger(ClienteRE.class);
+    private Log _log = null;
 
-    public ProveedorRE()
+    public ProveedorRE() throws Exception
     {
         _conexion = new Conexion();
+        _log = new Log(ProveedorRE.class.getName(), Constante.ENTIDAD_PROVEEDOR);
     }
 
     public ObjetoProveedorMO CrearProveedor(ProveedorMO clienteMO) throws Exception
@@ -145,8 +143,7 @@ public class ProveedorRE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         finally
@@ -181,8 +178,7 @@ public class ProveedorRE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         finally
@@ -340,8 +336,7 @@ public class ProveedorRE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         finally
@@ -376,8 +371,7 @@ public class ProveedorRE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         finally

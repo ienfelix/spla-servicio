@@ -1,6 +1,7 @@
 package com.grupogloria.splaservicio.Modelo;
 
-public class TokenMO {
+public class TokenMO
+{
     private String Token;
     private String Fecha;
 

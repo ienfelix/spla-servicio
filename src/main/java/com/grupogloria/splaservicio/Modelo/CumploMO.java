@@ -1,15 +1,13 @@
 package com.grupogloria.splaservicio.Modelo;
 
-import com.grupogloria.splaservicio.Comun.Constante;
-
-import org.springframework.boot.context.properties.ConfigurationProperties;
-
-@ConfigurationProperties(prefix = Constante.CUMPLO_PREFIX)
 public class CumploMO
 {
     private String Url;
     private String Username;
     private String Password;
+    private String Api;
+    private String Login;
+    private String Entidad;
     public Integer Status;
     public String Descripcion;
     public Boolean Exito;
@@ -38,6 +36,30 @@ public class CumploMO
 
     public void setPassword(String password) {
         Password = password;
+    }
+
+    public String getApi() {
+        return Api;
+    }
+
+    public void setApi(String api) {
+        Api = api;
+    }
+
+    public String getLogin() {
+        return Login;
+    }
+
+    public void setLogin(String login) {
+        Login = login;
+    }
+
+    public String getEntidad() {
+        return Entidad;
+    }
+
+    public void setEntidad(String entidad) {
+        Entidad = entidad;
     }
 
     public Integer getStatus() {

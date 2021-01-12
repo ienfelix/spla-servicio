@@ -1,26 +1,20 @@
 package com.grupogloria.splaservicio.Modelo;
 
-import com.grupogloria.splaservicio.Comun.Constante;
-
-import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.context.properties.ConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.ComponentScan;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.PropertySource;
-import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
-
-@Configuration
-@ComponentScan(basePackages = { "com.grupogloria.*" })
-@ConfigurationProperties(prefix = Constante.DATABASE_PREFIX)
-@PropertySource("classpath:application.properties")
 public class ConexionMO
 {
-    @Value("${database.Url}")
+    private String Driver;
     private String Url;
     private String Username;
     private String Password;
 
+    public String getDriver() {
+        return Driver;
+    }
+
+    public void setDriver(String driver) {
+        this.Driver = driver;
+    }
+    
     public String getUrl() {
         return Url;
     }
@@ -43,10 +37,5 @@ public class ConexionMO
 
     public void setPassword(String password) {
         this.Password = password;
-    }
-
-    @Bean
-    public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
-        return new PropertySourcesPlaceholderConfigurer();
     }
 }

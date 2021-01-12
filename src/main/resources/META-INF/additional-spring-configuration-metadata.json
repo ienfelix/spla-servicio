@@ -1,32 +1,77 @@
 {"properties": [
   {
-    "name": "database.Url",
+    "name": "sqlserver.driver",
     "type": "java.lang.String",
-    "description": "A description for 'database.Url'"
+    "description": "A description for 'sqlserver.driver'"
   },
   {
-    "name": "database.Username",
+    "name": "sqlserver.url",
     "type": "java.lang.String",
-    "description": "A description for 'database.Username'"
+    "description": "A description for 'sqlserver.url'"
   },
   {
-    "name": "database.Password",
+    "name": "sqlserver.username",
     "type": "java.lang.String",
-    "description": "A description for 'database.Password'"
+    "description": "A description for 'sqlserver.username'"
   },
   {
-    "name": "cumplo.Url",
+    "name": "sqlserver.password",
     "type": "java.lang.String",
-    "description": "A description for 'cumplo.Url'"
+    "description": "A description for 'sqlserver.password'"
   },
   {
-    "name": "cumplo.Username",
+    "name": "postgresql.url",
     "type": "java.lang.String",
-    "description": "A description for 'cumplo.Username'"
+    "description": "A description for 'postgresql.url'"
   },
   {
-    "name": "cumplo.Password",
+    "name": "postgresql.username",
     "type": "java.lang.String",
-    "description": "A description for 'cumplo.Password'"
+    "description": "A description for 'postgresql.username'"
+  },
+  {
+    "name": "postgresql.password",
+    "type": "java.lang.String",
+    "description": "A description for 'postgresql.password'"
+  },
+  {
+    "name": "cumplo.url",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.url'"
+  },
+  {
+    "name": "cumplo.username",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.username'"
+  },
+  {
+    "name": "cumplo.password",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.password'"
+  },
+  {
+    "name": "cumplo.api",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.api'"
+  },
+  {
+    "name": "cumplo.login",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.login'"
+  },
+  {
+    "name": "cumplo.entidad",
+    "type": "java.lang.String",
+    "description": "A description for 'cumplo.entidad'"
+  },
+  {
+    "name": "api.ruta-bitacora",
+    "type": "java.lang.String",
+    "description": "A description for 'api.ruta-bitacora'"
+  },
+  {
+    "name": "api.nombre-bitacora",
+    "type": "java.lang.String",
+    "description": "A description for 'api.nombre-bitacora'"
   }
 ]}

@@ -1,11 +1,8 @@
 package com.grupogloria.splaservicio.Negocio;
 
-import com.fasterxml.jackson.annotation.JsonAutoDetect;
-import com.fasterxml.jackson.annotation.JsonInclude.Include;
-import com.fasterxml.jackson.databind.DeserializationFeature;
-import com.fasterxml.jackson.databind.MapperFeature;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.grupogloria.splaservicio.Comun.Constante;
+import com.grupogloria.splaservicio.Comun.Log;
 import com.grupogloria.splaservicio.Comun.Util;
 import com.grupogloria.splaservicio.Interfaz.ProveedorIN;
 import com.grupogloria.splaservicio.Modelo.CumploMO;
@@ -14,43 +11,32 @@ import com.grupogloria.splaservicio.Modelo.ProveedorMO;
 import com.grupogloria.splaservicio.Modelo.TokenMO;
 import com.grupogloria.splaservicio.Repositorio.ProveedorRE;
 
-import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.client.RestTemplate;
 
-import ch.qos.logback.classic.Logger;
-
 public class ProveedorNE implements ProveedorIN
 {
-    private ProveedorRE _proveedorRE;
+    private ProveedorRE _proveedorRE = null;
     private RestTemplate _restTemplate;
-    private Util _util;
-    private TokenMO _tokenMO = null;
+    private TokenNE _tokenNE = null;
     private CumploMO _cumploMO = null;
     private HttpHeaders _httpHeaders = null;
     private ObjectMapper _objectMapper = null;
-    private Logger _logger = (Logger) LoggerFactory.getLogger(ProveedorNE.class);
+    private Log _log = null;
 
     public ProveedorNE() throws Exception
     {
         _proveedorRE = new ProveedorRE();
         _restTemplate = new RestTemplate();
-        _util = new Util();
-        _tokenMO = _util.ValidarToken();
-        _cumploMO = _util.ObtenerCumplo();
-        _httpHeaders = new HttpHeaders();
-        _httpHeaders.setContentType(MediaType.APPLICATION_JSON);
-        _httpHeaders.set(Constante.AUTHORIZATION, _tokenMO.getToken());
-        _objectMapper = new ObjectMapper();
-        _objectMapper.setSerializationInclusion(Include.NON_NULL);
-        _objectMapper.configure(MapperFeature.ACCEPT_CASE_INSENSITIVE_ENUMS, true);
-        _objectMapper.configure(DeserializationFeature.FAIL_ON_IGNORED_PROPERTIES, false);
-        _objectMapper.configure(DeserializationFeature.FAIL_ON_UNKNOWN_PROPERTIES, false);
-        _objectMapper.setVisibility(_objectMapper.getSerializationConfig().getDefaultVisibilityChecker().withFieldVisibility(JsonAutoDetect.Visibility.ANY).withGetterVisibility(JsonAutoDetect.Visibility.NONE).withSetterVisibility(JsonAutoDetect.Visibility.NONE).withCreatorVisibility(JsonAutoDetect.Visibility.NONE));
+        _tokenNE = new TokenNE();
+        _cumploMO = Util.ObtenerCumplo();
+        TokenMO tokenMO = _tokenNE.ValidarToken();
+        _httpHeaders = Util.GetHeaders(tokenMO);
+        _objectMapper = Util.GetObjectMapper();
+        _log = new Log(ProveedorNE.class.getName(), Constante.ENTIDAD_PROVEEDOR);
     }
 
     public ObjetoProveedorMO CrearProveedor(ProveedorMO proveedorMO) throws Exception
@@ -60,10 +46,10 @@ public class ProveedorNE implements ProveedorIN
         {
             String mensaje = "";
             String parametros = _objectMapper.writeValueAsString(proveedorMO);
-            _logger.info(String.format(Constante.PARAMETROS_INGRESO, parametros));
+            _log.info(String.format(Constante.PARAMETROS_INGRESO, parametros));
             String mensajeValidacion = ValidarProveedor(proveedorMO);
-            Boolean isNullOrEmpty = _util.IsNullOrEmpty(mensajeValidacion);
-            _logger.info(mensajeValidacion);
+            Boolean isNullOrEmpty = Util.IsNullOrEmpty(mensajeValidacion);
+            _log.info(mensajeValidacion);
 
             if (!isNullOrEmpty)
             {
@@ -73,28 +59,28 @@ public class ProveedorNE implements ProveedorIN
             else
             {
                 objetoProveedorMO = _proveedorRE.CrearProveedor(proveedorMO);
-                _logger.info(objetoProveedorMO.getMensaje());
+                _log.info(objetoProveedorMO.getMensaje());
 
                 if (objetoProveedorMO.getCodigo() == Constante.CODIGO_OK)
                 {
-                    mensaje = objetoProveedorMO.getMensaje();
                     String json = _objectMapper.writeValueAsString(proveedorMO);
                     HttpEntity<String> httpEntity = new HttpEntity<String>(json, _httpHeaders);
-                    var enlace = _cumploMO.getUrl() + "/" + Constante.CUMPLO_API + "/" + Constante.CUMPLO_CLIENTE + Constante.DELIMITADOR_PREGUNTA + Constante.MODIFICAR + Constante.DELIMITADOR_IGUAL + Constante.FALSE;
+                    var enlace = _cumploMO.getUrl() + "/" + _cumploMO.getApi() + "/" + _cumploMO.getEntidad() + Constante.DELIMITADOR_PREGUNTA + Constante.MODIFICAR + Constante.DELIMITADOR_IGUAL + Constante.FALSE;
                     ResponseEntity<String> responseEntity = _restTemplate.exchange(enlace, HttpMethod.POST, httpEntity, String.class);
                     CumploMO respuestaMO = _objectMapper.readValue(responseEntity.getBody(), CumploMO.class);
                     Boolean cumploExito = respuestaMO.getExito() == null ? false : respuestaMO.getExito();
-                    _logger.info(cumploExito ? respuestaMO.getDetalle() : respuestaMO.getDescripcion());
+                    mensaje = respuestaMO.getDetalle() == null ? respuestaMO.getDescripcion() : respuestaMO.getDetalle();
+                    _log.info(mensaje);
+                    mensaje = objetoProveedorMO.getMensaje() + Constante.DELIMITADOR_BARRA + mensaje;
                     objetoProveedorMO.setCodigo(cumploExito ? Constante.CODIGO_OK : Constante.CODIGO_NO_OK);
-                    objetoProveedorMO.setMensaje(cumploExito ? respuestaMO.getDetalle() : respuestaMO.getDescripcion());
+                    objetoProveedorMO.setMensaje(mensaje);
 
                     if (cumploExito)
                     {
                         parametros = _objectMapper.writeValueAsString(respuestaMO.getCliente());
-                        _logger.info(String.format(Constante.PARAMETROS_SALIDA, parametros));
-                        mensaje += Constante.DELIMITADOR_BARRA + respuestaMO.getDetalle();
+                        _log.info(String.format(Constante.PARAMETROS_SALIDA, parametros));
                         objetoProveedorMO = ActivarProveedor(proveedorMO.getIdInternoCliente());
-                        _logger.info(objetoProveedorMO.getMensaje());
+                        _log.info(objetoProveedorMO.getMensaje());
                         mensaje += Constante.DELIMITADOR_BARRA + objetoProveedorMO.getMensaje();
                         objetoProveedorMO.setMensaje(mensaje);
                     }
@@ -103,8 +89,7 @@ public class ProveedorNE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         return objetoProveedorMO;
@@ -119,8 +104,7 @@ public class ProveedorNE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         return objetoProveedorMO;
@@ -133,8 +117,8 @@ public class ProveedorNE implements ProveedorIN
         {
             String mensaje = "";
             String parametros = _objectMapper.writeValueAsString(proveedorMO);
-            _logger.info(String.format(Constante.PARAMETROS_INGRESO, parametros));
-            Boolean isNullOrEmpty = _util.IsNullOrEmpty(proveedorMO.getIdInternoCliente());
+            _log.info(String.format(Constante.PARAMETROS_INGRESO, parametros));
+            Boolean isNullOrEmpty = Util.IsNullOrEmpty(proveedorMO.getIdInternoCliente());
 
             if (isNullOrEmpty)
             {
@@ -145,21 +129,21 @@ public class ProveedorNE implements ProveedorIN
             {
                 String json = _objectMapper.writeValueAsString(proveedorMO);
                 HttpEntity<String> httpEntity = new HttpEntity<String>(json, _httpHeaders);
-                var enlace = _cumploMO.getUrl() + "/" + Constante.CUMPLO_API + "/" + Constante.CUMPLO_CLIENTE + Constante.DELIMITADOR_PREGUNTA + Constante.MODIFICAR + Constante.DELIMITADOR_IGUAL + Constante.TRUE;
+                var enlace = _cumploMO.getUrl() + "/" + _cumploMO.getApi() + "/" + _cumploMO.getEntidad() + Constante.DELIMITADOR_PREGUNTA + Constante.MODIFICAR + Constante.DELIMITADOR_IGUAL + Constante.TRUE;
                 ResponseEntity<String> responseEntity = _restTemplate.exchange(enlace, HttpMethod.POST, httpEntity, String.class);
                 CumploMO respuestaMO = _objectMapper.readValue(responseEntity.getBody(), CumploMO.class);
                 Boolean cumploExito = respuestaMO.getExito() == null ? false : respuestaMO.getExito();
-                _logger.info(cumploExito ? respuestaMO.getDetalle() : respuestaMO.getDescripcion());
-                mensaje = cumploExito ? respuestaMO.getDetalle() : respuestaMO.getDescripcion();
+                mensaje = respuestaMO.getDetalle() == null ? respuestaMO.getDescripcion() : respuestaMO.getDetalle();
+                _log.info(mensaje);
                 objetoProveedorMO.setCodigo(cumploExito ? Constante.CODIGO_NO_OK : Constante.CODIGO_NO_OK);
-                objetoProveedorMO.setMensaje(cumploExito ? respuestaMO.getDetalle() : respuestaMO.getDescripcion());
+                objetoProveedorMO.setMensaje(mensaje);
 
                 if (cumploExito)
                 {
                     parametros = _objectMapper.writeValueAsString(respuestaMO.getCliente());
-                    _logger.info(String.format(Constante.PARAMETROS_SALIDA, parametros));
+                    _log.info(String.format(Constante.PARAMETROS_SALIDA, parametros));
                     objetoProveedorMO = _proveedorRE.EditarProveedor(proveedorMO);
-                    _logger.info(objetoProveedorMO.getMensaje());
+                    _log.info(objetoProveedorMO.getMensaje());
                     mensaje += Constante.DELIMITADOR_BARRA + objetoProveedorMO.getMensaje();
                     objetoProveedorMO.setMensaje(mensaje);
                 }
@@ -167,8 +151,7 @@ public class ProveedorNE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         return objetoProveedorMO;
@@ -180,9 +163,9 @@ public class ProveedorNE implements ProveedorIN
         try
         {
             String mensaje = "";
-            _logger.info(String.format(Constante.PARAMETROS_INGRESO, idInternoCliente));
+            _log.info(String.format(Constante.PARAMETROS_INGRESO, idInternoCliente));
 
-            Boolean isNullOrEmpty = _util.IsNullOrEmpty(idInternoCliente);
+            Boolean isNullOrEmpty = Util.IsNullOrEmpty(idInternoCliente);
 
             if (isNullOrEmpty)
             {
@@ -192,17 +175,19 @@ public class ProveedorNE implements ProveedorIN
             else
             {
                 HttpEntity<String> httpEntity = new HttpEntity<String>(_httpHeaders);
-                var enlace = _cumploMO.getUrl() + "/" + Constante.CUMPLO_API + "/" + Constante.CUMPLO_CLIENTE + Constante.DELIMITADOR_PREGUNTA + Constante.CODIGO_INTERNO_CLIENTE + Constante.DELIMITADOR_IGUAL + idInternoCliente;
+                var enlace = _cumploMO.getUrl() + "/" + _cumploMO.getApi() + "/" + _cumploMO.getEntidad() + Constante.DELIMITADOR_PREGUNTA + Constante.CODIGO_INTERNO_CLIENTE + Constante.DELIMITADOR_IGUAL + idInternoCliente;
                 ResponseEntity<String> responseEntity = _restTemplate.exchange(enlace, HttpMethod.DELETE, httpEntity, String.class);
                 CumploMO respuestaMO = _objectMapper.readValue(responseEntity.getBody(), CumploMO.class);
                 Boolean cumploExito = respuestaMO.getExito() == null ? false : respuestaMO.getExito();
-                _logger.info(cumploExito ? respuestaMO.getDetalle() : respuestaMO.getDescripcion());
+                mensaje = respuestaMO.getDetalle() == null ? respuestaMO.getDescripcion() : respuestaMO.getDetalle();
+                _log.info(mensaje);
+                objetoProveedorMO.setCodigo(cumploExito ? Constante.CODIGO_NO_OK : Constante.CODIGO_NO_OK);
+                objetoProveedorMO.setMensaje(mensaje);
 
                 if (cumploExito)
                 {
-                    mensaje += Constante.DELIMITADOR_BARRA + respuestaMO.getDescripcion();
                     objetoProveedorMO = InactivarProveedor(idInternoCliente);
-                    _logger.info(objetoProveedorMO.getMensaje());
+                    _log.info(objetoProveedorMO.getMensaje());
                     mensaje += Constante.DELIMITADOR_BARRA + objetoProveedorMO.getMensaje();
                     objetoProveedorMO.setMensaje(mensaje);
                 }
@@ -210,8 +195,7 @@ public class ProveedorNE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         return objetoProveedorMO;
@@ -226,14 +210,13 @@ public class ProveedorNE implements ProveedorIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         return objetoProveedorMO;
     }
     
-    public String ValidarProveedor(ProveedorMO proveedorMO)
+    public String ValidarProveedor(ProveedorMO proveedorMO) throws Exception
     {
         String mensaje = "";
         try
@@ -252,31 +235,31 @@ public class ProveedorNE implements ProveedorIN
                 Integer idCategoria = proveedorMO.getIdCategoria();
                 Integer idEmpresa = proveedorMO.getIdEmpresa();
 
-                if (_util.IsNullOrEmpty(idInternoCliente))
+                if (Util.IsNullOrEmpty(idInternoCliente))
                 {
                     mensaje += Constante.MENSAJE_ID_INTERNO_CLIENTE;
                 }
-                if (_util.IsNullOrEmpty(denominacion))
+                if (Util.IsNullOrEmpty(denominacion))
                 {
                     mensaje += Constante.MENSAJE_DENOMINACION;
                 }
-                if (_util.IsNullOrEmpty(documento))
+                if (Util.IsNullOrEmpty(documento))
                 {
                     mensaje += Constante.MENSAJE_DOCUMENTO;
                 }
-                if (_util.IsNullOrEmpty(idTipoDocumento))
+                if (Util.IsNullOrEmpty(idTipoDocumento))
                 {
                     mensaje += Constante.MENSAJE_ID_TIPO_DOCUMENTO;
                 }
-                if (_util.IsNullOrEmpty(idTipoEntidad))
+                if (Util.IsNullOrEmpty(idTipoEntidad))
                 {
                     mensaje += Constante.MENSAJE_ID_TIPO_ENTIDAD;
                 }
-                if (_util.IsNullOrEmpty(idCategoria))
+                if (Util.IsNullOrEmpty(idCategoria))
                 {
                     mensaje += Constante.MENSAJE_ID_CATEGORIA;
                 }
-                if (_util.IsNullOrEmpty(idEmpresa))
+                if (Util.IsNullOrEmpty(idEmpresa))
                 {
                     mensaje += Constante.MENSAJE_ID_EMPRESA;
                 }

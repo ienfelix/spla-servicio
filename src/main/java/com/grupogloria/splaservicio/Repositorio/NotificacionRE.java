@@ -6,12 +6,9 @@ import java.sql.ResultSet;
 
 import com.grupogloria.splaservicio.Comun.Conexion;
 import com.grupogloria.splaservicio.Comun.Constante;
+import com.grupogloria.splaservicio.Comun.Log;
 import com.grupogloria.splaservicio.Interfaz.NotificacionIN;
 import com.grupogloria.splaservicio.Modelo.ObjetoNotificacionMO;
-
-import org.slf4j.LoggerFactory;
-
-import ch.qos.logback.classic.Logger;
 
 public class NotificacionRE implements NotificacionIN
 {
@@ -19,11 +16,12 @@ public class NotificacionRE implements NotificacionIN
     private Connection _con = null;
     private CallableStatement _cst = null;
     private ResultSet _rst = null;
-    private static final Logger _logger = (Logger) LoggerFactory.getLogger(NotificacionRE.class);
+    private Log _log = null;
 
-    public NotificacionRE()
+    public NotificacionRE() throws Exception
     {
         _conexion = new Conexion();
+        _log = new Log(NotificacionRE.class.getName(), "");
     }
 
     public ObjetoNotificacionMO EnviarNotificacion (String json, String destinatario) throws Exception
@@ -50,8 +48,7 @@ public class NotificacionRE implements NotificacionIN
         }
         catch (Exception e)
         {
-            var stack = e.getStackTrace()[Constante._0];
-            _logger.error(String.format(Constante.ERROR, stack.getClassName(), stack.getMethodName(), stack.getLineNumber(), e.getMessage()));
+            _log.error(e);
             throw e;
         }
         finally
