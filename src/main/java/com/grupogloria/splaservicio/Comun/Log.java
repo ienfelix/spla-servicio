@@ -11,7 +11,8 @@ import java.util.logging.Level;
 import java.util.logging.Logger;
 import java.util.logging.SimpleFormatter;
 
-import org.springframework.util.ResourceUtils;
+import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ClassPathResource;
 
 public class Log
 {
@@ -26,12 +27,16 @@ public class Log
 
     private FileHandler GetFileHandler(String entidad) throws Exception
     {
-        FileHandler fileHandler;
-        InputStream inputStream = null;
+        FileHandler fileHandler = null;
+        InputStream inputStream = null, inputStreamTemp = null;
         try
         {
-            File file = ResourceUtils.getFile(Constante.APPLICATION_PROPERTIES);
-            inputStream = new FileInputStream(file);
+            ClassPathResource classPathResource = new ClassPathResource(Constante.APPLICATION_PROPERTIES);
+            inputStreamTemp = classPathResource.getInputStream();
+            File tempFile = File.createTempFile(Constante.APPLICATION_PROPERTIES, null);
+            FileUtils.copyInputStreamToFile(inputStreamTemp, tempFile);
+            inputStream = new FileInputStream(tempFile);
+            tempFile.delete();
             Properties properties = new Properties();
             properties.load(inputStream);
             String rutaBitacora = Util.IsNullOrEmpty(properties.getProperty(Constante.API_RUTA_BITACORA)) ? "" : properties.getProperty(Constante.API_RUTA_BITACORA);
@@ -74,6 +79,10 @@ public class Log
             if (inputStream != null)
             {
                 inputStream.close();
+            }
+            if (inputStreamTemp != null)
+            {
+                inputStreamTemp.close();
             }
         }
         return fileHandler;

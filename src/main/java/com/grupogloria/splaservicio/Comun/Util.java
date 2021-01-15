@@ -14,9 +14,10 @@ import com.grupogloria.splaservicio.Modelo.ConexionMO;
 import com.grupogloria.splaservicio.Modelo.CumploMO;
 import com.grupogloria.splaservicio.Modelo.TokenMO;
 
+import org.apache.commons.io.FileUtils;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
-import org.springframework.util.ResourceUtils;
 
 public class Util
 {
@@ -27,11 +28,15 @@ public class Util
     public static CumploMO ObtenerCumplo() throws Exception
     {
         CumploMO cumploMO = new CumploMO();
-        InputStream inputStream = null;
+        InputStream inputStream = null, inputStreamTemp = null;
         try
         {
-            File file = ResourceUtils.getFile(Constante.APPLICATION_PROPERTIES);
-            inputStream = new FileInputStream(file);
+            ClassPathResource classPathResource = new ClassPathResource(Constante.APPLICATION_PROPERTIES);
+            inputStreamTemp = classPathResource.getInputStream();
+            File tempFile = File.createTempFile(Constante.APPLICATION_PROPERTIES, null);
+            FileUtils.copyInputStreamToFile(inputStreamTemp, tempFile);
+            inputStream = new FileInputStream(tempFile);
+            tempFile.delete();
             Properties properties = new Properties();
             properties.load(inputStream);
             String url = Util.IsNullOrEmpty(properties.getProperty(Constante.CUMPLO_URL)) ? "" : properties.getProperty(Constante.CUMPLO_URL);
@@ -54,7 +59,14 @@ public class Util
         }
         finally
         {
-            inputStream.close();
+            if (inputStream != null)
+            {
+                inputStream.close();
+            }
+            if (inputStreamTemp != null)
+            {
+                inputStreamTemp.close();
+            }
         }
         return cumploMO;
     }
@@ -62,11 +74,15 @@ public class Util
     public static ConexionMO ObtenerConexion() throws Exception
     {
         ConexionMO conexionMO = new ConexionMO();
-        InputStream inputStream = null;
+        InputStream inputStream = null, inputStreamTemp = null;
         try
         {
-            File file = ResourceUtils.getFile(Constante.APPLICATION_PROPERTIES);
-            inputStream = new FileInputStream(file);
+            ClassPathResource classPathResource = new ClassPathResource(Constante.APPLICATION_PROPERTIES);
+            inputStreamTemp = classPathResource.getInputStream();
+            File tempFile = File.createTempFile(Constante.APPLICATION_PROPERTIES, null);
+            FileUtils.copyInputStreamToFile(inputStreamTemp, tempFile);
+            inputStream = new FileInputStream(tempFile);
+            tempFile.delete();
             Properties properties = new Properties();
             properties.load(inputStream);
             String driver = Util.IsNullOrEmpty(properties.getProperty(Constante.SQLSERVER_DRIVER)) ? "" : properties.getProperty(Constante.SQLSERVER_DRIVER);
@@ -85,7 +101,14 @@ public class Util
         }
         finally
         {
-            inputStream.close();
+            if (inputStream != null)
+            {
+                inputStream.close();
+            }
+            if (inputStreamTemp != null)
+            {
+                inputStreamTemp.close();
+            }
         }
         return conexionMO;
     }

@@ -58,6 +58,12 @@
      <artifactId>httpcore</artifactId>
      <version>4.4.11</version>
    </dependency>
+ 
+   <dependency>
+     <groupId>work.eddiejamsession</groupId>
+     <artifactId>jam-file-utils</artifactId>
+     <version>0.14.3</version>
+   </dependency>
  </dependencies>
 
 	<build>
