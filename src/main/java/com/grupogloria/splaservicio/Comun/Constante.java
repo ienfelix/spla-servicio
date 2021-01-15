@@ -97,7 +97,7 @@ public class Constante {
     public static final Boolean ESTADO_INACTIVO = false;
     public static final String APPLICATION_JSON = "application/json";
     public static final String AUTHORIZATION = "Authorization";
-    public static final String APPLICATION_PROPERTIES = "classpath:application.properties";
+    public static final String APPLICATION_PROPERTIES = "application.properties";
     public static final String SQLSERVER_DRIVER = "sqlserver.driver";
     public static final String SQLSERVER_URL = "sqlserver.url";
     public static final String SQLSERVER_USERNAME = "sqlserver.username";
