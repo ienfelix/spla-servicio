@@ -108,6 +108,13 @@ public class Constante {
     public static final String CUMPLO_API = "cumplo.api";
     public static final String CUMPLO_LOGIN = "cumplo.login";
     public static final String CUMPLO_ENTIDAD = "cumplo.entidad";
+    public static final String MAIL_HOST = "mail.host";
+    public static final String MAIL_PORT = "mail.port";
+    public static final String MAIL_TRANSPORT_PROTOCOL = "mail.transport.protocol";
+    public static final String MAIL_SMTP_AUTH = "mail.smtp.auth";
+    public static final String MAIL_SMTP_STARTTLS_ENABLE = "mail.smtp.starttls.enable";
+    public static final String MAIL_SMTP_SSL_ENABLE = "mail.smtp.ssl.enable";
+    public static final String MAIL_DEBUG = "mail.debug";
     public static final Integer CUMPLO_CODIGO_OK = 1;
     public static final String DELIMITADOR_PREGUNTA = "?";
     public static final String DELIMITADOR_IGUAL = "=";
@@ -136,4 +143,9 @@ public class Constante {
     public static final String ENTIDAD_CLIENTE = "Cliente";
     public static final String ENTIDAD_PROVEEDOR = "Proveedor";
     public static final String ENTIDAD_COLABORADOR = "Colaborador";
+    public static final String SERVICIO = "Servicio";
+    public static final String CONSOLA = "Consola";
+    public static final String MENSAJE_SI = "Se";
+    public static final String MENSAJE_NO = "No se";
+    public static final String MENSAJE_NOTIFICACION = "%1$s envió la notificación > %2$s";
 }

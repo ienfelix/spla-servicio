@@ -18,6 +18,8 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
+import org.springframework.mail.javamail.JavaMailSender;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
 
 public class Util
 {
@@ -111,6 +113,56 @@ public class Util
             }
         }
         return conexionMO;
+    }
+
+    public static JavaMailSender ObtenerMailSender() throws Exception
+    {
+        JavaMailSenderImpl javaMailSender = new JavaMailSenderImpl();
+        InputStream inputStream = null, inputStreamTemp = null;
+        try
+        {
+            ClassPathResource classPathResource = new ClassPathResource(Constante.APPLICATION_PROPERTIES);
+            inputStreamTemp = classPathResource.getInputStream();
+            File tempFile = File.createTempFile(Constante.APPLICATION_PROPERTIES, null);
+            FileUtils.copyInputStreamToFile(inputStreamTemp, tempFile);
+            inputStream = new FileInputStream(tempFile);
+            tempFile.delete();
+            Properties properties = new Properties();
+            properties.load(inputStream);
+            String host = Util.IsNullOrEmpty(properties.getProperty(Constante.MAIL_HOST)) ? "" : properties.getProperty(Constante.MAIL_HOST);
+            String mailPort = IsNullOrEmpty(properties.getProperty(Constante.MAIL_PORT)) ? "" : properties.getProperty(Constante.MAIL_PORT);
+            Integer port = Integer.parseInt(mailPort);
+            String protocol = Util.IsNullOrEmpty(properties.getProperty(Constante.MAIL_TRANSPORT_PROTOCOL)) ? "" : properties.getProperty(Constante.MAIL_TRANSPORT_PROTOCOL);
+            String auth = Util.IsNullOrEmpty(properties.getProperty(Constante.MAIL_SMTP_AUTH)) ? "" : properties.getProperty(Constante.MAIL_SMTP_AUTH);
+            String starttls = Util.IsNullOrEmpty(properties.getProperty(Constante.MAIL_SMTP_STARTTLS_ENABLE)) ? "" : properties.getProperty(Constante.MAIL_SMTP_STARTTLS_ENABLE);
+            String ssl = Util.IsNullOrEmpty(properties.getProperty(Constante.MAIL_SMTP_SSL_ENABLE)) ? "" : properties.getProperty(Constante.MAIL_SMTP_SSL_ENABLE);
+            String debug = Util.IsNullOrEmpty(properties.getProperty(Constante.MAIL_DEBUG)) ? "" : properties.getProperty(Constante.MAIL_DEBUG);
+            properties.clear();
+            javaMailSender.setHost(host);
+            javaMailSender.setPort(port);
+            Properties props = javaMailSender.getJavaMailProperties();
+            props.put(Constante.MAIL_TRANSPORT_PROTOCOL, protocol);
+            props.put(Constante.MAIL_SMTP_AUTH, auth);
+            props.put(Constante.MAIL_SMTP_STARTTLS_ENABLE, starttls);
+            props.put(Constante.MAIL_SMTP_SSL_ENABLE, ssl);
+            props.put(Constante.MAIL_DEBUG, debug);
+        }
+        catch(Exception e)
+        {
+            throw e;
+        }
+        finally
+        {
+            if (inputStream != null)
+            {
+                inputStream.close();
+            }
+            if (inputStreamTemp != null)
+            {
+                inputStreamTemp.close();
+            }
+        }
+        return javaMailSender;
     }
 
     public static Boolean IsNullOrEmpty(String valor) throws Exception
