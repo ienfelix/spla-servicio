@@ -8,6 +8,7 @@ import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.Properties;
 
+import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -73,10 +74,11 @@ public class NotificacionNE implements NotificacionIN {
                 String rutaConsola = rutaServicio.replace(Constante.SERVICIO, Constante.CONSOLA);
                 String body = GetMessageBody(notificacionMO);
                 String utf8 = StandardCharsets.UTF_8.name();
+                InternetAddress[] internetAddress = InternetAddress.parse(notificacionMO.getPara());
                 MimeMessage mimeMessage = _mailSender.createMimeMessage();
                 MimeMessageHelper mimeMessageHelper = new MimeMessageHelper(mimeMessage, MimeMessageHelper.MULTIPART_MODE_MIXED_RELATED, utf8);
                 mimeMessageHelper.setFrom(notificacionMO.getDe());
-                mimeMessageHelper.setTo(notificacionMO.getPara());
+                mimeMessageHelper.setTo(internetAddress);
                 mimeMessageHelper.setSubject(notificacionMO.getAsunto());
                 mimeMessageHelper.setText(body, true);
                 File fileServicio = FileUtils.getFile(rutaServicio);
