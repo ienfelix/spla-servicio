@@ -66,7 +66,7 @@ public class NotificacionNE implements NotificacionIN {
                 String rutaBitacora = Util.IsNullOrEmpty(properties.getProperty(Constante.API_RUTA_BITACORA)) ? "" : properties.getProperty(Constante.API_RUTA_BITACORA);
                 String nombreBitacora = Util.IsNullOrEmpty(properties.getProperty(Constante.API_NOMBRE_BITACORA)) ? "" : properties.getProperty(Constante.API_NOMBRE_BITACORA);
                 properties.clear();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constante.FORMAT_FECHA);
                 String date = simpleDateFormat.format(new Date());
                 String nombreServicio = notificacionMO.getEntidad() + Constante.DELIMITADOR_GUION_BAJO + nombreBitacora + Constante.DELIMITADOR_PUNTO + Constante.EXTENSION_TXT;
                 String nombreConsola = nombreServicio.replace(Constante.SERVICIO, Constante.CONSOLA);
@@ -124,22 +124,34 @@ public class NotificacionNE implements NotificacionIN {
                 cuerpo += "<title>" + notificacionMO.getAsunto() + "</title>";
                 cuerpo += "</head>";
                 cuerpo += "<body>";
-                cuerpo += "<table>";
+                cuerpo += "<table style='width:100%'>";
                 cuerpo += "<caption>Tipo de entidad procesada [" + notificacionMO.getEntidad() + "].</caption>";
                 cuerpo += "<thead>";
-                cuerpo += "<tr><th colspan='2'>El archivo comprimido procesado es [" + notificacionMO.getNombreArchivo() + "].</th></tr>";
+                cuerpo += "<tr><th>El archivo comprimido procesado es [" + notificacionMO.getNombreArchivo() + "].</th></tr>";
+                cuerpo += "<tr><th>Fecha Inicial > [" + notificacionMO.getFechaInicial() + "] | Fecha Final > [" + notificacionMO.getFechaFinal() + "].</th></tr>";
                 cuerpo += "</thead>";
                 cuerpo += "<tbody>";
 
                 for (int i = Constante._0; i < notificacionMO.getListaArchivos().size(); i++)
                 {
                     ArchivoMO archivoMO = notificacionMO.getListaArchivos().get(i);
-                    cuerpo += "<tr><td>Archivo Interno:</td><td>Resultado:</td></tr>";
+                    cuerpo += "<tr><td>Archivo Interno:</td></tr>";
                     cuerpo += "<tr>";
                     cuerpo += "<td>" + archivoMO.getNombreArchivo() + "</td>";
+                    cuerpo += "</tr>";
+                    cuerpo += "<tr><td>Resultado:</td></tr>";
+                    cuerpo += "<tr>";
                     cuerpo += "<td>" + archivoMO.getMensaje() + "</td>";
                     cuerpo += "</tr>";
-                    cuerpo += "<tr><td colspan='2' style='border-bottom: 1px solid black'></td></tr>";
+                    cuerpo += "<tr><td>Fecha Inicio:</td></tr>";
+                    cuerpo += "<tr>";
+                    cuerpo += "<td>" + archivoMO.getFechaInicio() + "</td>";
+                    cuerpo += "</tr>";
+                    cuerpo += "<tr><td>Fecha Fin:</td></tr>";
+                    cuerpo += "<tr>";
+                    cuerpo += "<td>" + archivoMO.getFechaFin() + "</td>";
+                    cuerpo += "</tr>";
+                    cuerpo += "<tr><td style='border-bottom: 1px solid black'></td></tr>";
                 }
 
                 cuerpo += "</tbody>";

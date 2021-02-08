@@ -59,7 +59,7 @@ public class TokenNE implements TokenIN
                 ResponseEntity<String> responseEntity = _restTemplate.exchange(enlace, HttpMethod.POST, httpEntity, String.class);
                 CumploMO respuesta = _objectMapper.readValue(responseEntity.getBody(), CumploMO.class);
                 Integer cumploCodigo = respuesta.getStatus();
-                SimpleDateFormat simpleDateFormat = new SimpleDateFormat("yyyy-MM-dd");
+                SimpleDateFormat simpleDateFormat = new SimpleDateFormat(Constante.FORMAT_FECHA);
                 var fecha = new Date();
                 _log.info(String.format(Constante.MENSAJE_TOKEN_DESCARGADO, respuesta.getDescripcion(), simpleDateFormat.format(fecha)));
 

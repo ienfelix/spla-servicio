@@ -148,4 +148,5 @@ public class Constante {
     public static final String MENSAJE_SI = "Se";
     public static final String MENSAJE_NO = "No se";
     public static final String MENSAJE_NOTIFICACION = "%1$s envió la notificación > %2$s";
+    public static final String FORMAT_FECHA = "yyyy-MM-dd";
 }
